@@ -2,7 +2,14 @@ use axum::{routing::get, routing::put, Router};
 mod database;
 mod rest;
 
+use database::{Database, DatabaseConfig, DatabaseError};
 use rest::models::config::ApiConfig;
+
+async fn create_database() -> Result<Database, DatabaseError> {
+    let config = DatabaseConfig::from_env().map_err(|e| DatabaseError::from(e))?;
+    let database: Database = Database::new(config).await?;
+    Ok(database)
+}
 #[tokio::main]
 async fn main() {
     let api_config: ApiConfig = ApiConfig::from_env();

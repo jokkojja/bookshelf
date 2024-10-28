@@ -4,7 +4,7 @@ use sqlx::SqlitePool;
 use std::env;
 use std::str::FromStr;
 
-struct DatabaseConfig {
+pub struct DatabaseConfig {
     options: SqliteConnectOptions,
 }
 
@@ -14,7 +14,7 @@ enum DatabaseConfigError {
     Parse(sqlx::Error),
 }
 #[derive(Debug)]
-enum DatabaseError {
+pub enum DatabaseError {
     Pool(sqlx::Error),
 }
 
@@ -29,13 +29,8 @@ impl From<sqlx::Error> for DatabaseConfigError {
         DatabaseConfigError::Parse(err)
     }
 }
-impl From<sqlx::Error> for DatabaseError {
-    fn from(err: sqlx::Error) -> Self {
-        DatabaseError::Pool(err)
-    }
-}
 impl DatabaseConfig {
-    fn from_env() -> Result<Self, DatabaseConfigError> {
+    pub fn from_env() -> Result<Self, DatabaseConfigError> {
         dotenv().ok();
         let database_url = env::var("DATABASE_URL")?;
         let options = SqliteConnectOptions::from_str(&database_url)?;
@@ -44,12 +39,17 @@ impl DatabaseConfig {
     }
 }
 
-struct Database {
+pub struct Database {
     pool: SqlitePool,
 }
 
+impl From<sqlx::Error> for DatabaseError {
+    fn from(err: sqlx::Error) -> Self {
+        DatabaseError::Pool(err)
+    }
+}
 impl Database {
-    async fn new(config: DatabaseConfig) -> Result<Self, DatabaseError> {
+    pub async fn new(config: DatabaseConfig) -> Result<Self, DatabaseError> {
         let pool = SqlitePool::connect_with(config.options).await?;
 
         Ok(Self { pool })
