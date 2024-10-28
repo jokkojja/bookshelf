@@ -6,14 +6,14 @@ use database::{Database, DatabaseConfig, DatabaseError};
 use rest::models::config::ApiConfig;
 
 async fn create_database() -> Result<Database, DatabaseError> {
-    let config = DatabaseConfig::from_env().map_err(|e| DatabaseError::from(e))?;
+    let config = DatabaseConfig::from_env().expect("Invalid database config");
     let database: Database = Database::new(config).await?;
     Ok(database)
 }
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), DatabaseError> {
     let api_config: ApiConfig = ApiConfig::from_env();
-
+    let database: Database = create_database().await?;
     let app = Router::new().route("/", get(|| async { "Hello world" }));
     // .route("/", put(add_gook))
     // .route("/books", get(get_books))
@@ -24,4 +24,5 @@ async fn main() {
         .await
         .unwrap();
     axum::serve(listener, app).await.unwrap();
+    Ok(())
 }

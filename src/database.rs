@@ -8,27 +8,17 @@ pub struct DatabaseConfig {
     options: SqliteConnectOptions,
 }
 
-#[derive(Debug)]
-enum DatabaseConfigError {
-    EnvVar(std::env::VarError),
-    Parse(sqlx::Error),
-}
-#[derive(Debug)]
-pub enum DatabaseError {
-    Pool(sqlx::Error),
+#[derive(Debug, thiserror::Error)]
+#[error(transparent)]
+pub enum DatabaseConfigError {
+    InvalidEnv(#[from] std::env::VarError),
+    InvalidDatabaseUrl(#[from] sqlx::Error),
 }
 
-impl From<std::env::VarError> for DatabaseConfigError {
-    fn from(err: std::env::VarError) -> Self {
-        DatabaseConfigError::EnvVar(err)
-    }
-}
+#[derive(Debug, thiserror::Error)]
+#[error(transparent)]
+pub struct DatabaseError(#[from] pub sqlx::Error);
 
-impl From<sqlx::Error> for DatabaseConfigError {
-    fn from(err: sqlx::Error) -> Self {
-        DatabaseConfigError::Parse(err)
-    }
-}
 impl DatabaseConfig {
     pub fn from_env() -> Result<Self, DatabaseConfigError> {
         dotenv().ok();
@@ -41,12 +31,6 @@ impl DatabaseConfig {
 
 pub struct Database {
     pool: SqlitePool,
-}
-
-impl From<sqlx::Error> for DatabaseError {
-    fn from(err: sqlx::Error) -> Self {
-        DatabaseError::Pool(err)
-    }
 }
 impl Database {
     pub async fn new(config: DatabaseConfig) -> Result<Self, DatabaseError> {
