@@ -1,9 +1,9 @@
 version: "3.11"
 
 services:
-  regiment:
-    container_name: regiment
-    image: regiment
+  bookshelf:
+    container_name: bookshelf
+    image: bookshelf
     build:
       dockerfile: Dockerfile
     environment:
@@ -11,11 +11,9 @@ services:
       - "ADDRESS=127.0.0.1:3000"
     volumes:
       - ./db:/app/db
-    restart: unless-stopped
+    # restart: unless-stopped
     ports:
       - 3000:3000
-    depends_on:
-      - sqlite
 
 volumes:
   sqlite-data:
