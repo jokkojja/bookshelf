@@ -13,7 +13,9 @@ async fn create_database() -> Result<Database, DatabaseError> {
 #[tokio::main]
 async fn main() -> Result<(), DatabaseError> {
     let api_config: ApiConfig = ApiConfig::from_env();
+
     let database: Database = create_database().await?;
+
     let app = Router::new().route("/", get(|| async { "Hello world" }));
     // .route("/", put(add_gook))
     // .route("/books", get(get_books))
