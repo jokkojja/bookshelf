@@ -1,9 +1,10 @@
 use axum::{routing::get, routing::put, Router};
-mod database;
-mod rest;
 
 use database::{Database, DatabaseConfig, DatabaseError};
 use rest::models::config::ApiConfig;
+
+mod database;
+mod rest;
 
 async fn create_database() -> Result<Database, DatabaseError> {
     let config = DatabaseConfig::from_env().expect("Invalid database config");

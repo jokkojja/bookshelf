@@ -7,8 +7,8 @@ services:
     build:
       dockerfile: Dockerfile
     environment:
-      - "DATABASE_URL=app/db/database.db"
-      - "ADDRESS=127.0.0.1:3000"
+      - "DATABASE_URL=/app/db/database.db"
+      - "ADDRESS=0.0.0.0:3000"
     volumes:
       - ./db:/app/db
     # restart: unless-stopped
