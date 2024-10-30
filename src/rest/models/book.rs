@@ -1,3 +1,4 @@
+use super::author::Author;
 use super::genre::Genre;
 
 pub struct Books {
@@ -5,6 +6,6 @@ pub struct Books {
 }
 pub struct Book {
     pub name: String,
-    pub author: String,
+    pub author: Author,
     pub genre: Genre,
 }

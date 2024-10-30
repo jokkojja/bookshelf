@@ -1,3 +1,4 @@
+use crate::rest::models::author::{self, Author};
 use dotenv::dotenv;
 use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
@@ -37,5 +38,23 @@ impl Database {
         let pool = SqlitePool::connect_with(config.options).await?;
 
         Ok(Self { pool })
+    }
+
+    pub async fn get_authors(&self) -> Result<Vec<Author>, DatabaseError> {
+        let rows = sqlx::query!(
+            r#"SELECT first_name as "first_name: String", last_name as "last_name: String" FROM authors;"#
+        )
+        .fetch_all(&self.pool)
+        .await?;
+
+        let authors = rows
+            .iter()
+            .map(|row| Author {
+                first_name: row.first_name.clone(),
+                second_name: row.last_name.clone(),
+            })
+            .collect();
+
+        Ok(authors)
     }
 }

@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "select first_name, last_name from authors",
+  "describe": {
+    "columns": [
+      {
+        "name": "first_name",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "last_name",
+        "ordinal": 1,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "a8f2d245800327d6bd1d1be8219d0e3450d3165d411b2119c9cd996714bc0817"
+}
