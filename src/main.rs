@@ -1,6 +1,7 @@
 use axum::{routing::get, routing::put, Router};
 
 use database::{Database, DatabaseConfig, DatabaseError};
+use rest::books::{get_authors, AppState};
 use rest::models::config::ApiConfig;
 
 mod database;
@@ -14,15 +15,14 @@ async fn create_database() -> Result<Database, DatabaseError> {
 #[tokio::main]
 async fn main() -> Result<(), DatabaseError> {
     let api_config: ApiConfig = ApiConfig::from_env();
-
     let database: Database = create_database().await?;
+    let app_state = AppState { database };
 
-    let app = Router::new().route("/", get(|| async { "Hello world" }));
-    // .route("/", put(add_gook))
-    // .route("/books", get(get_books))
-    // .route("/book/:id", get(get_book_by_id)
+    let app = Router::new()
+        .route("/", get(|| async { "Hello world" }))
+        .route("/authors", get(get_authors))
+        .with_state(&app_state); // Задаем состояние приложения для маршрутизатора
 
-    // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind(api_config.address)
         .await
         .unwrap();

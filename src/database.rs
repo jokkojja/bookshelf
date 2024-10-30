@@ -1,4 +1,4 @@
-use crate::rest::models::author::{self, Author};
+use crate::rest::models::author::Author;
 use dotenv::dotenv;
 use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
@@ -38,6 +38,10 @@ impl Database {
         let pool = SqlitePool::connect_with(config.options).await?;
 
         Ok(Self { pool })
+    }
+
+    pub async fn put_author(&self, author: Author) -> Result<(), DatabaseError> {
+        unimplemented!();
     }
 
     pub async fn get_authors(&self) -> Result<Vec<Author>, DatabaseError> {
