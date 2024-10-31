@@ -1,8 +1,9 @@
+use axum::http::Method;
 use axum::{routing::get, routing::put, Router};
-
 use database::{Database, DatabaseConfig, DatabaseError};
 use rest::api::{get_authors, get_book, get_books, get_genres, put_author, put_genre, AppState};
 use rest::models::config::ApiConfig;
+use tower_http::cors::{Any, CorsLayer};
 
 mod database;
 mod rest;
@@ -18,6 +19,14 @@ async fn main() -> Result<(), DatabaseError> {
     let api_config: ApiConfig = ApiConfig::from_env();
     let database: Database = create_database().await?;
     let app_state = AppState { database };
+
+    let cors = CorsLayer::new().allow_origin(Any).allow_methods([
+        Method::GET,
+        Method::POST,
+        Method::PUT,
+        Method::DELETE,
+    ]);
+
     let app = Router::new()
         .route("/", get(|| async { "Hello world" }))
         .route("/authors", get(get_authors))
@@ -26,7 +35,8 @@ async fn main() -> Result<(), DatabaseError> {
         .route("/genre", put(put_genre))
         .route("/books", get(get_books))
         .route("/books/:id", get(get_book))
-        .with_state(app_state); // Задаем состояние приложения для маршрутизатора
+        .with_state(app_state)
+        .layer(cors);
 
     let listener = tokio::net::TcpListener::bind(api_config.address)
         .await
