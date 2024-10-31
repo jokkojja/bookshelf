@@ -1,9 +1,14 @@
 use axum::http::Method;
 use axum::{routing::get, routing::put, Router};
 use database::{Database, DatabaseConfig, DatabaseError};
-use rest::api::{get_authors, get_book, get_books, get_genres, put_author, put_genre, AppState};
+use rest::api::{
+    get_authors, get_book, get_books, get_genres, put_author, put_genre, ApiDoc, AppState,
+};
 use rest::models::config::ApiConfig;
 use tower_http::cors::{Any, CorsLayer};
+use utoipa::OpenApi;
+use utoipa_axum::router::OpenApiRouter;
+use utoipa_swagger_ui::SwaggerUi;
 
 mod database;
 mod rest;
@@ -27,7 +32,7 @@ async fn main() -> Result<(), DatabaseError> {
         Method::DELETE,
     ]);
 
-    let app = Router::new()
+    let app = OpenApiRouter::new()
         .route("/", get(|| async { "Hello world" }))
         .route("/authors", get(get_authors))
         .route("/author", put(put_author))
@@ -36,8 +41,8 @@ async fn main() -> Result<(), DatabaseError> {
         .route("/books", get(get_books))
         .route("/books/:id", get(get_book))
         .with_state(app_state)
+        .merge(SwaggerUi::new("/swagger-ui").url("api-doc/openapi.json", ApiDoc::openapi()))
         .layer(cors);
-
     let listener = tokio::net::TcpListener::bind(api_config.address)
         .await
         .unwrap();

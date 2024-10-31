@@ -5,12 +5,24 @@ use crate::database::Database;
 use axum::extract::{Path, State};
 use axum::{http::StatusCode, Json};
 use log::info;
+use utoipa::OpenApi;
+
+#[derive(OpenApi)]
+#[openapi(paths(get_authors), components(schemas(Authors)))]
+pub struct ApiDoc;
 
 #[derive(Clone)]
 pub struct AppState {
     pub database: Database,
 }
 
+#[utoipa::path(
+    get,
+    path="/authors",
+    responses(
+        (status = 200, body = [Authors]),
+        (status = 404)
+    ))]
 pub async fn get_authors(State(state): State<AppState>) -> Result<Json<Authors>, StatusCode> {
     info!("Call method: get_authors with author");
     let authors = state
