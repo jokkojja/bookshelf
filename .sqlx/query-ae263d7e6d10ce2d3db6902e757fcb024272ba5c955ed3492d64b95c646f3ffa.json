@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO AUTHORS (first_name, last_name) VALUES ($1, $2);",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "ae263d7e6d10ce2d3db6902e757fcb024272ba5c955ed3492d64b95c646f3ffa"
+}

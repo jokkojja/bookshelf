@@ -1,8 +1,10 @@
 use super::models::author::{Author, Authors};
-use super::models::genres::{self, Genre, Genres};
+use super::models::book::{Book, Books};
+use super::models::genres::{Genre, Genres};
 use crate::database::Database;
-use axum::extract::State;
+use axum::extract::{Path, State};
 use axum::{http::StatusCode, Json};
+use log::info;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -10,6 +12,7 @@ pub struct AppState {
 }
 
 pub async fn get_authors(State(state): State<AppState>) -> Result<Json<Authors>, StatusCode> {
+    info!("Call method: get_authors with author");
     let authors = state
         .database
         .get_authors()
@@ -22,6 +25,10 @@ pub async fn put_author(
     State(state): State<AppState>,
     Json(author): Json<Author>,
 ) -> Result<StatusCode, StatusCode> {
+    info!(
+        "Call method: put_author with author: {} {}",
+        author.last_name, author.first_name
+    );
     state
         .database
         .put_author(author)
@@ -31,6 +38,7 @@ pub async fn put_author(
 }
 
 pub async fn get_genres(State(state): State<AppState>) -> Result<Json<Genres>, StatusCode> {
+    info!("Call method: get genres with genre");
     let genres = state
         .database
         .get_genres()
@@ -44,6 +52,7 @@ pub async fn put_genre(
     State(state): State<AppState>,
     Json(genre): Json<Genre>,
 ) -> Result<StatusCode, StatusCode> {
+    info!("Call method: put_genre with genre: {}", genre.genre);
     state
         .database
         .put_genre(genre)
@@ -51,4 +60,28 @@ pub async fn put_genre(
         .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR))?;
 
     Ok(StatusCode::OK)
+}
+
+pub async fn get_books(State(state): State<AppState>) -> Result<Json<Books>, StatusCode> {
+    info!("Call method: get_books");
+
+    let books = state
+        .database
+        .get_books()
+        .await
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR))?;
+    Ok(Json(books))
+}
+
+pub async fn get_book(
+    State(state): State<AppState>,
+    Path(book_id): Path<String>,
+) -> Result<Json<Book>, StatusCode> {
+    info!("Call method: get_book with ID: {}", book_id);
+    let book = state
+        .database
+        .get_book(book_id)
+        .await
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR))?;
+    Ok(Json(book))
 }

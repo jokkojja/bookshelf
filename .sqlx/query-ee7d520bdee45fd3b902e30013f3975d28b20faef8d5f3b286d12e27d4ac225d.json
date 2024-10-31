@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT books.title as \"title: String\",\n        authors.first_name as \"first_name: String\",\n        authors.last_name as \"last_name: String\",\n        genres.name as \"genre: String\"\n        from books\n            join authors on books.author_id = authors.id\n            join genres on books.genre_id = genres.id\n        where books.id = $1;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "title: String",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "first_name: String",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "last_name: String",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "genre: String",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "ee7d520bdee45fd3b902e30013f3975d28b20faef8d5f3b286d12e27d4ac225d"
+}

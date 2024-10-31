@@ -1,7 +1,8 @@
 use crate::rest::models::author::{Author, Authors};
-use crate::rest::models::genres::{self, Genre, Genres};
-use axum::http::StatusCode;
+use crate::rest::models::book::{Book, Books};
+use crate::rest::models::genres::{Genre, Genres};
 use dotenv::dotenv;
+use log::error;
 use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
 use std::env;
@@ -94,5 +95,61 @@ impl Database {
             .execute(&self.pool)
             .await?;
         Ok(())
+    }
+
+    pub async fn get_books(&self) -> Result<Books, DatabaseError> {
+        let rows = sqlx::query!(
+            r#"SELECT books.title as "title: String",
+        authors.first_name as "first_name: String",
+        authors.last_name as "last_name: String",
+        genres.name as "genre: String"
+        from books
+            join authors on books.author_id = authors.id
+            join genres on books.genre_id = genres.id;
+        "#
+        )
+        .fetch_all(&self.pool)
+        .await?;
+        let books: Books = Books {
+            books: rows
+                .iter()
+                .map(|row| Book {
+                    title: row.title.clone(),
+                    author: Author {
+                        first_name: row.first_name.clone(),
+                        last_name: row.last_name.clone(),
+                    },
+                    genre: row.genre.clone(),
+                })
+                .collect(),
+        };
+        Ok(books)
+    }
+
+    pub async fn get_book(&self, book_id: String) -> Result<Book, DatabaseError> {
+        let row = sqlx::query!(
+            r#"SELECT books.title as "title: String",
+        authors.first_name as "first_name: String",
+        authors.last_name as "last_name: String",
+        genres.name as "genre: String"
+        from books
+            join authors on books.author_id = authors.id
+            join genres on books.genre_id = genres.id
+        where books.id = $1;
+        "#,
+            book_id
+        )
+        .fetch_one(&self.pool)
+        .await?;
+
+        let book: Book = Book {
+            title: row.title.clone(),
+            author: Author {
+                first_name: row.first_name.clone(),
+                last_name: row.last_name.clone(),
+            },
+            genre: row.genre.clone(),
+        };
+        Ok(book)
     }
 }

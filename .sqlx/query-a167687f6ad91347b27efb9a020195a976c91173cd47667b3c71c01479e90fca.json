@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT name as \"genre: String\" FROM genres",
+  "describe": {
+    "columns": [
+      {
+        "name": "genre: String",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "a167687f6ad91347b27efb9a020195a976c91173cd47667b3c71c01479e90fca"
+}

@@ -1,15 +1,15 @@
 {
   "db_name": "SQLite",
-  "query": "select first_name, last_name from authors",
+  "query": "SELECT first_name as \"first_name: String\", last_name as \"last_name: String\" FROM authors;",
   "describe": {
     "columns": [
       {
-        "name": "first_name",
+        "name": "first_name: String",
         "ordinal": 0,
         "type_info": "Text"
       },
       {
-        "name": "last_name",
+        "name": "last_name: String",
         "ordinal": 1,
         "type_info": "Text"
       }
@@ -22,5 +22,5 @@
       false
     ]
   },
-  "hash": "a8f2d245800327d6bd1d1be8219d0e3450d3165d411b2119c9cd996714bc0817"
+  "hash": "0eae7958de37380dee93e9e70d1963780c3598c3614a9d7c6c0c1cfe29fa6f0b"
 }

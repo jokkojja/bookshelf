@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO genres (name) VALUES ($1);",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "115f8593e1d117504b0b6ac6f4f51b3ae0bd3f7da145eeabde23cb5826e3c022"
+}
