@@ -2,17 +2,12 @@
 
 const API_URL = "http://localhost:3000";
 
-export async function fetchAuthors() {
-    const response = await fetch(`${API_URL}/authors`);
-    return response.json();
-}
-
-export async function fetchGenres() {
-    const response = await fetch(`${API_URL}/genres`);
-    return response.json();
-}
-
 export async function fetchBooks() {
     const response = await fetch(`${API_URL}/books`);
-    return response.json();
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    console.log('Fetched books:', data); // Добавляем лог для проверки
+    return data; // Убедитесь, что это массив
 }
