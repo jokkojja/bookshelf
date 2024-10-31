@@ -1,12 +1,11 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
-pub struct Author {
-    pub first_name: String,
-    pub last_name: String,
+pub struct Genres {
+    pub genres: Vec<Genre>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
-pub struct Authors {
-    pub authors: Vec<Author>,
+pub struct Genre {
+    pub genre: String,
 }

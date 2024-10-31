@@ -1,4 +1,6 @@
 use crate::rest::models::author::{Author, Authors};
+use crate::rest::models::genres::{self, Genre, Genres};
+use axum::http::StatusCode;
 use dotenv::dotenv;
 use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
@@ -41,7 +43,14 @@ impl Database {
     }
 
     pub async fn put_author(&self, author: Author) -> Result<(), DatabaseError> {
-        unimplemented!();
+        sqlx::query!(
+            "INSERT INTO AUTHORS (first_name, last_name) VALUES ($1, $2);",
+            author.first_name,
+            author.last_name
+        )
+        .execute(&self.pool)
+        .await?;
+        Ok(())
     }
 
     pub async fn get_authors(&self) -> Result<Authors, DatabaseError> {
@@ -61,5 +70,29 @@ impl Database {
                 .collect(),
         };
         Ok(authors)
+    }
+
+    pub async fn get_genres(&self) -> Result<Genres, DatabaseError> {
+        let rows = sqlx::query!(r#"SELECT name as "genre: String" FROM genres"#)
+            .fetch_all(&self.pool)
+            .await?;
+
+        let genres: Genres = Genres {
+            genres: rows
+                .iter()
+                .map(|row| Genre {
+                    genre: row.genre.clone(),
+                })
+                .collect(),
+        };
+
+        Ok(genres)
+    }
+
+    pub async fn put_genre(&self, genre: Genre) -> Result<(), DatabaseError> {
+        sqlx::query!("INSERT INTO genres (name) VALUES ($1);", genre.genre)
+            .execute(&self.pool)
+            .await?;
+        Ok(())
     }
 }

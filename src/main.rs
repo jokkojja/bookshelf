@@ -1,7 +1,7 @@
 use axum::{routing::get, routing::put, Router};
 
 use database::{Database, DatabaseConfig, DatabaseError};
-use rest::books::{get_authors, AppState};
+use rest::books::{get_authors, get_genres, put_author, put_genre, AppState};
 use rest::models::config::ApiConfig;
 
 mod database;
@@ -21,6 +21,9 @@ async fn main() -> Result<(), DatabaseError> {
     let app = Router::new()
         .route("/", get(|| async { "Hello world" }))
         .route("/authors", get(get_authors))
+        .route("/author", put(put_author))
+        .route("/genres", get(get_genres))
+        .route("/genre", put(put_genre))
         .with_state(app_state); // Задаем состояние приложения для маршрутизатора
 
     let listener = tokio::net::TcpListener::bind(api_config.address)
