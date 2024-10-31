@@ -11,9 +11,15 @@ services:
       - "ADDRESS=0.0.0.0:3000"
     volumes:
       - ./db:/app/db
-    # restart: unless-stopped
     ports:
       - 3000:3000
 
-volumes:
-  sqlite-data:
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - bookshelf
