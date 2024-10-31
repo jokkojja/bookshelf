@@ -21,7 +21,7 @@ async fn main() -> Result<(), DatabaseError> {
     let app = Router::new()
         .route("/", get(|| async { "Hello world" }))
         .route("/authors", get(get_authors))
-        .with_state(&app_state); // Задаем состояние приложения для маршрутизатора
+        .with_state(app_state); // Задаем состояние приложения для маршрутизатора
 
     let listener = tokio::net::TcpListener::bind(api_config.address)
         .await
