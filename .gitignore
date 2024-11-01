@@ -25,4 +25,4 @@ Cargo.lock
 /target
 .env
 /db
-.vscode
+/.vscode
