@@ -38,7 +38,7 @@ pub mod api {
 
     #[utoipa::path(
     put,
-    path="/author",
+    path="/authors",
     responses(
         (status = 200),
         (status = 404)
@@ -81,7 +81,7 @@ pub mod api {
 
     #[utoipa::path(
     put,
-    path="/genre",
+    path="/genres",
     responses(
         (status = 200),
         (status = 404)
@@ -122,7 +122,7 @@ pub mod api {
 
     #[utoipa::path(
     put,
-    path="/book",
+    path="/books/{id}",
     responses(
         (status = 200),
         (status = 404)
