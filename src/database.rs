@@ -126,7 +126,7 @@ impl Database {
         Ok(books)
     }
 
-    pub async fn get_book(&self, book_id: String) -> Result<Book, DatabaseError> {
+    pub async fn get_book(&self, book_id: i32) -> Result<Book, DatabaseError> {
         let row = sqlx::query!(
             r#"SELECT books.title as "title: String",
         authors.first_name as "first_name: String",

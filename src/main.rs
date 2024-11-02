@@ -1,22 +1,17 @@
-use crate::rest::api::api::{
+// There __path using like shit, but i didnt find any other way to use
+// endpoints defined in other file, like my api.rs
+use crate::rest::api::{
     get_authors, get_book, get_books, get_genres, put_author, put_genre, ApiDoc, AppState,
     __path_get_authors, __path_get_book, __path_get_books, __path_get_genres, __path_put_author,
     __path_put_genre,
 };
 
-use axum::{
-    http::Method,
-    routing::{get, put},
-    Router,
-};
+use axum::http::Method;
 use database::{Database, DatabaseConfig, DatabaseError};
 use rest::models::config::ApiConfig;
 use tower_http::cors::{Any, CorsLayer};
 use utoipa::OpenApi;
-use utoipa_axum::{
-    router::{self, OpenApiRouter},
-    routes,
-};
+use utoipa_axum::{router::OpenApiRouter, routes};
 use utoipa_swagger_ui::SwaggerUi;
 
 mod database;
@@ -34,10 +29,8 @@ async fn router() -> Result<OpenApiRouter, DatabaseError> {
     ]);
 
     let router = OpenApiRouter::new()
-        .routes(routes!(get_authors))
-        .routes(routes!(put_author))
-        .routes(routes!(get_genres))
-        .routes(routes!(put_genre))
+        .routes(routes!(get_authors, put_author))
+        .routes(routes!(get_genres, put_genre))
         .routes(routes!(get_book))
         .routes(routes!(get_books))
         .with_state(app_state)
@@ -50,6 +43,7 @@ async fn create_database() -> Result<Database, DatabaseError> {
     let database: Database = Database::new(config).await?;
     Ok(database)
 }
+
 #[tokio::main]
 async fn main() -> Result<(), DatabaseError> {
     env_logger::init();
@@ -60,8 +54,7 @@ async fn main() -> Result<(), DatabaseError> {
         .nest("/api/v1", router)
         .split_for_parts();
 
-    let router =
-        router.merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", api.clone()));
+    let router = router.merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", api));
 
     let listener = tokio::net::TcpListener::bind(api_config.address)
         .await
