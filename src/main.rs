@@ -10,14 +10,28 @@ use axum::http::Method;
 use database::{Database, DatabaseConfig, DatabaseError};
 use rest::models::config::ApiConfig;
 use tower_http::cors::{Any, CorsLayer};
+use tower_http::trace::TraceLayer;
+use tower_http::trace::{DefaultMakeSpan, DefaultOnResponse};
+use tracing_subscriber::layer::SubscriberExt;
 use utoipa::OpenApi;
 use utoipa_axum::{router::OpenApiRouter, routes};
 use utoipa_swagger_ui::SwaggerUi;
-
 mod database;
 mod rest;
 
 async fn router() -> Result<OpenApiRouter, DatabaseError> {
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+                format!(
+                    "{}=debug,tower_http=debug,axum::rejection=trace",
+                    env!("CARGO_CRATE_NAME")
+                )
+                .into()
+            }),
+        )
+        .with(tracing_subscriber::fmt::layer());
+
     let database: Database = create_database().await?;
     let app_state = AppState { database };
 
@@ -34,7 +48,12 @@ async fn router() -> Result<OpenApiRouter, DatabaseError> {
         .routes(routes!(get_book))
         .routes(routes!(get_books))
         .with_state(app_state)
-        .layer(cors);
+        .layer(cors)
+        .layer(
+            TraceLayer::new_for_http()
+                .make_span_with(DefaultMakeSpan::default().include_headers(true)) // Log headers
+                .on_response(DefaultOnResponse::new().include_headers(true)), // Log response details
+        );
 
     Ok(router)
 }
