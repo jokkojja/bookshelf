@@ -1,13 +1,13 @@
 use crate::rest::models::author::{Author, Authors};
 use crate::rest::models::book::{Book, Books};
 use crate::rest::models::genres::{Genre, Genres};
-use dotenv::dotenv;
-use log::error;
+use log::{error, info};
 use sqlx::sqlite::SqliteConnectOptions;
 use sqlx::SqlitePool;
 use std::env;
 use std::str::FromStr;
 
+#[derive(Debug)]
 pub struct DatabaseConfig {
     options: SqliteConnectOptions,
 }
@@ -25,7 +25,6 @@ pub struct DatabaseError(#[from] pub sqlx::Error);
 
 impl DatabaseConfig {
     pub fn from_env() -> Result<Self, DatabaseConfigError> {
-        dotenv().ok();
         let database_url = env::var("DATABASE_URL")?;
         let options = SqliteConnectOptions::from_str(&database_url)?;
 
@@ -61,12 +60,13 @@ impl Database {
         .fetch_all(&self.pool)
         .await?;
 
+        info!("Found authors: {}", rows.len());
         let authors = Authors {
             authors: rows
-                .iter()
+                .into_iter()
                 .map(|row| Author {
-                    first_name: row.first_name.clone(),
-                    last_name: row.last_name.clone(),
+                    first_name: row.first_name,
+                    last_name: row.last_name,
                 })
                 .collect(),
         };
@@ -80,10 +80,8 @@ impl Database {
 
         let genres: Genres = Genres {
             genres: rows
-                .iter()
-                .map(|row| Genre {
-                    genre: row.genre.clone(),
-                })
+                .into_iter()
+                .map(|row| Genre { genre: row.genre })
                 .collect(),
         };
 
@@ -112,14 +110,14 @@ impl Database {
         .await?;
         let books: Books = Books {
             books: rows
-                .iter()
+                .into_iter()
                 .map(|row| Book {
-                    title: row.title.clone(),
+                    title: row.title,
                     author: Author {
-                        first_name: row.first_name.clone(),
-                        last_name: row.last_name.clone(),
+                        first_name: row.first_name,
+                        last_name: row.last_name,
                     },
-                    genre: row.genre.clone(),
+                    genre: row.genre,
                 })
                 .collect(),
         };
@@ -137,7 +135,7 @@ impl Database {
             join genres on books.genre_id = genres.id
         where books.id = $1;
         "#,
-            book_id
+            book_id,
         )
         .fetch_one(&self.pool)
         .await?;

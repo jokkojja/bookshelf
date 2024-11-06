@@ -5,9 +5,9 @@ use crate::rest::api::{
     __path_get_authors, __path_get_book, __path_get_books, __path_get_genres, __path_put_author,
     __path_put_genre,
 };
-
 use axum::http::Method;
 use database::{Database, DatabaseConfig, DatabaseError};
+use dotenv::dotenv;
 use rest::models::config::ApiConfig;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
@@ -65,6 +65,7 @@ async fn create_database() -> Result<Database, DatabaseError> {
 
 #[tokio::main]
 async fn main() -> Result<(), DatabaseError> {
+    dotenv().ok();
     env_logger::init();
     let api_config: ApiConfig = ApiConfig::from_env();
     let router = router().await?;
@@ -73,7 +74,7 @@ async fn main() -> Result<(), DatabaseError> {
         .nest("/api/v1", router)
         .split_for_parts();
 
-    let router = router.merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", api));
+    let router = router.merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", api));
 
     let listener = tokio::net::TcpListener::bind(api_config.address)
         .await

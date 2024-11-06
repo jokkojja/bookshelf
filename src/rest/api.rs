@@ -15,7 +15,6 @@ use utoipa::OpenApi;
 // If both methods are used, the routes will be duplicated.
 
 const TODO_TAG: &str = "bookshelf";
-
 // #[openapi(paths(get_authors, put_author, get_genres, put_genre, get_books))]
 #[derive(OpenApi)]
 #[openapi(
