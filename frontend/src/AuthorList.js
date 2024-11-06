@@ -6,7 +6,7 @@ function AuthorList() {
     const [error, setError] = useState(null);
 
     const fetchAuthors = () => {
-        fetch("http://localhost:3000/authors")
+        fetch("http://localhost:3000/api/v1/authors")
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Network response was not ok");

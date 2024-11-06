@@ -1,6 +1,6 @@
 // frontend/src/api.js
 
-const API_URL = "http://localhost:3000";
+const API_URL = "http://localhost:3000/api/v1";
 
 export async function fetchBooks() {
     const response = await fetch(`${API_URL}/books`);

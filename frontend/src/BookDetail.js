@@ -11,7 +11,7 @@ function BookDetail() {
             return;
         }
 
-        fetch(`http://localhost:3000/books/${bookId}`)
+        fetch(`http://localhost:3000/api/v1/books/${bookId}`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Network response was not ok");

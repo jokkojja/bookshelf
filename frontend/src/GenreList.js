@@ -6,7 +6,7 @@ function GenreList() {
     const [error, setError] = useState(null);
 
     const fetchGenres = () => {
-        fetch("http://localhost:3000/genres")
+        fetch("http://localhost:3000/api/v1/genres")
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Network response was not ok");
