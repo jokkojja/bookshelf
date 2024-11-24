@@ -6,7 +6,7 @@ use crate::rest::api::{
     __path_put_genre,
 };
 use axum::http::Method;
-use database::{Database, DatabaseConfig, DatabaseError};
+use database::{Database, DatabaseConfig};
 use dotenv::dotenv;
 use rest::models::config::ApiConfig;
 use tower_http::cors::{Any, CorsLayer};
@@ -19,7 +19,7 @@ use utoipa_swagger_ui::SwaggerUi;
 mod database;
 mod rest;
 
-async fn router() -> Result<OpenApiRouter, DatabaseError> {
+async fn router() -> Result<OpenApiRouter, anyhow::Error> {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
@@ -57,14 +57,14 @@ async fn router() -> Result<OpenApiRouter, DatabaseError> {
 
     Ok(router)
 }
-async fn create_database() -> Result<Database, DatabaseError> {
-    let config = DatabaseConfig::from_env().expect("Invalid database config");
+async fn create_database() -> Result<Database, anyhow::Error> {
+    let config: DatabaseConfig = serde_env::from_env()?;
     let database: Database = Database::new(config).await?;
     Ok(database)
 }
 
 #[tokio::main]
-async fn main() -> Result<(), DatabaseError> {
+async fn main() -> Result<(), anyhow::Error> {
     dotenv().ok();
     env_logger::init();
     let api_config: ApiConfig = ApiConfig::from_env();

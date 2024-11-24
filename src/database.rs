@@ -2,20 +2,22 @@ use crate::rest::models::author::{Author, Authors};
 use crate::rest::models::book::{Book, Books};
 use crate::rest::models::genres::{Genre, Genres};
 use log::{error, info};
+use serde::Deserialize;
 use sqlx::sqlite::SqliteConnectOptions;
-use sqlx::SqlitePool;
-use std::env;
+use sqlx::{migrate, SqlitePool};
 use std::str::FromStr;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub struct DatabaseConfig {
-    options: SqliteConnectOptions,
+    database_url: String,
 }
 
 #[derive(Debug, thiserror::Error)]
 #[error(transparent)]
 pub enum DatabaseConfigError {
-    InvalidEnv(#[from] std::env::VarError),
+    #[error("Missing or invalid environment variable")]
+    InvalidEnv(#[from] serde_env::Error),
+    #[error(transparent)]
     InvalidDatabaseUrl(#[from] sqlx::Error),
 }
 
@@ -23,22 +25,15 @@ pub enum DatabaseConfigError {
 #[error(transparent)]
 pub struct DatabaseError(#[from] pub sqlx::Error);
 
-impl DatabaseConfig {
-    pub fn from_env() -> Result<Self, DatabaseConfigError> {
-        let database_url = env::var("DATABASE_URL")?;
-        let options = SqliteConnectOptions::from_str(&database_url)?;
-
-        Ok(Self { options })
-    }
-}
 #[derive(Clone)]
 pub struct Database {
     pool: SqlitePool,
 }
 impl Database {
-    pub async fn new(config: DatabaseConfig) -> Result<Self, DatabaseError> {
-        let pool = SqlitePool::connect_with(config.options).await?;
-
+    pub async fn new(config: DatabaseConfig) -> Result<Database, anyhow::Error> {
+        let options: SqliteConnectOptions = SqliteConnectOptions::from_str(&config.database_url)?;
+        let pool = SqlitePool::connect_with(options).await?;
+        migrate!().run(&pool).await?;
         Ok(Self { pool })
     }
 
